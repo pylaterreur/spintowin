@@ -18,7 +18,7 @@ namespace
       return (++counter_);
     }
 
-    operator int()
+    operator T()
     {
       return (++counter_);
     }
