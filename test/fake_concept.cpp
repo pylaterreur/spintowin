@@ -8,6 +8,11 @@ struct Foo
   {
     return (42);
   }
+
+  int f(double)
+  {
+    return (42);
+  }
 };
 
 template <typename Class>
