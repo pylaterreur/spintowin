@@ -6,18 +6,35 @@ struct Queue
 {
   typedef std::shared_ptr<T> value_type;
 
-protected:
-  void insert(value_type data)
+  Queue() : i_(0), r_(0)
+  {}
+
+  ~Queue()
   {
-    buffer_[r_ & (Size - 1)] = data;
+    for (auto &p : buffer_)
+      {
+	p = value_type();
+      }
+  }
+
+  void push_back(value_type data)
+  {
+    // increment_insert();
+    buffer_[i_ & (Size - 1)] = data;
+  }
+
+protected:
+  inline unsigned increment_insert()
+  {
     i_ = (i_ + 1) & (Size - 1);
   }
 
+  // we dont care about exceptions, on fait pas de top() + pop()
   value_type pop()
   {
     value_type ret;
 
-    ret = buffer_[i_];
+    ret = buffer_[r_];
     //    buffer_[i_] = value_type();
     r_ = (r_ + 1) & (Size - 1);
     return (ret);
@@ -25,8 +42,8 @@ protected:
 
 protected:
   static const unsigned Size = 1 << 3;
-  unsigned	i_, r_;
   value_type	buffer_[Size];
+  unsigned	i_, r_;
 };
 
 #endif

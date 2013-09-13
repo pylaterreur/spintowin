@@ -44,7 +44,7 @@ namespace
     {
       {
 	// std::vector<std::string> q;
-	//	std::copy(q.consume_begin(), q.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+	std::copy(q.consume_begin(), q.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
       }
     }
 
@@ -52,12 +52,21 @@ namespace
 
   struct Producer
   {
+    const char* const filename_;
+
+    // Producer(Producer&&) = default;
+
+    Producer(const Producer& copy) : filename_(copy.filename_)
+    {}
+
+    Producer(const char * const filename = "toto.txt") : filename_(filename)
+    {}
+
     template <typename Q>
     void operator()(Q& q) const
     {
-      static const char* const filename = "toto.txt";
-      std::ifstream ifile(filename);
-      auto begin = q.produce_begin();
+      std::ifstream ifile(filename_);
+      auto begin = std::back_inserter(q);
 
       std::for_each(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), [&begin](const std::string &input)
 		    {
@@ -66,7 +75,7 @@ namespace
 		    }
 		    );
       if (!ifile.eof())
-	std::cerr << "problem with file " << filename << std::endl;
+	std::cerr << "problem with file " << filename_ << std::endl;
     }
 
   };
