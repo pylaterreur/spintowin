@@ -31,7 +31,25 @@ template <typename Super>
 struct Consumer : Super
 {
 private:
-  struct iterator : std::iterator<std::input_iterator_tag, typename Super::Business::value_type>, iterator_base
+  template <typename T>
+  struct dereference_iterator
+  {
+    T operator*()
+    {
+      //      return (std::string("hihi"));
+    }
+  };
+
+  template <template <typename...> class Container, typename T, typename ...Others>
+  struct dereference_iterator<Container<T, Others...> >
+  {
+    T operator*()
+    {
+      return (std::string("hihi"));
+    }
+  };
+
+  struct iterator : std::iterator<std::input_iterator_tag, typename Super::Business::value_type>, iterator_base, dereference_iterator<typename Super::Business::value_type>
   {
     typedef typename Super::Business::value_type value_type;
     typedef typename Super::Whole::Business QueueType;
@@ -80,17 +98,12 @@ private:
     //   return (prev);
     // }
 
-// iterator
+    // iterator
 
     iterator operator++()
     {
       
       return (*this);
-    }
-
-    typename Super::Business::value_type::element_type operator*()
-    {
-      //      return (std::string("hihi"));
     }
 
     QueueType *q_;
