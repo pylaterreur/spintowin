@@ -3,20 +3,6 @@
 
 namespace Layers
 {
-// template <typename Super>
-// struct Dereferencer : Super
-// {
-// public:
-//   struct Business : Super::Business
-//   {
-//     template <typename... T>
-//     Business(T&&... t) : Super::Business(t...)
-//     {}
-
-//     operator typename Super::Business::value_type::element_type() const;
-//   };
-// };
-
 template <typename Super>
 struct Producer : Super
 {

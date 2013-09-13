@@ -23,7 +23,7 @@ protected:
     return (ret);
   }
 
-private:
+protected:
   static const unsigned Size = 1 << 3;
   unsigned	i_, r_;
   value_type	buffer_[Size];

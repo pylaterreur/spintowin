@@ -10,7 +10,6 @@
 
 namespace
 {
-// template <typename Base>
   struct iterator_base// : Base
 {
   template <typename T>
