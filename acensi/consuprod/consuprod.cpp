@@ -18,6 +18,14 @@ namespace
     return (false);
   }
 
+  template <typename T>
+  bool operator!=(T&& t) const
+  {
+    return (!(*this == std::forward<T>(t)));
+  }
+
+
+
   // template <typename T>
   // T& operator=(T&& t);
 
@@ -44,7 +52,7 @@ namespace
     {
       {
 	// std::vector<std::string> q;
-	std::copy(q.consume_begin(), q.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+	std::copy(std::move(q.consume_begin()), q.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
       }
     }
 

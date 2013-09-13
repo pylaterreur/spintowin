@@ -8,31 +8,6 @@ namespace Layers
 template <typename Super>
 struct Producer : Super
 {
-private:
-  struct iterator : std::iterator<std::output_iterator_tag, typename Super::Business::value_type>, iterator_base
-  {
-    //    typedef typename Super::Business::value_type value_type;
-
-    iterator operator++(int)
-    {
-      iterator prev = *this;
-      ++*this;
-      return (prev);
-    }
-
-    iterator operator++()
-    {
-      return (*this);
-    }
-
-    typename Super::Business::value_type &operator*()
-    {
-      std::cout << "MA BITE" << std::endl;
-      return (*new typename Super::Business::value_type(new std::string("LOl")));
-      // 
-    }
-  };
-
 public:
   struct Business : Super::Business
   {
@@ -66,7 +41,10 @@ private:
 
     iterator(iterator &&copy) = default;
 
-    iterator(const iterator &copy) = delete;
+    iterator(const iterator &copy)
+    {
+      std::cerr << "GOT A COPY HERE MAN" << std::endl;
+    }
 
     iterator(QueueType &q)
     {
@@ -110,9 +88,9 @@ private:
       return (*this);
     }
 
-    typename Super::Business::value_type &operator*()
+    typename Super::Business::value_type::element_type operator*()
     {
-      
+      //      return (std::string("hihi"));
     }
 
     QueueType *q_;
@@ -138,7 +116,9 @@ public:
     }
 
     iterator consume_begin()
-    {}
+    {
+      
+    }
 
     iterator end()
     {}
