@@ -35,7 +35,8 @@ namespace
 }
 
 #include "Assembly.hpp"
-#include "Layers.hpp"
+#include "Layers/Consumer.hpp"
+#include "Layers/Producer.hpp"
 #include "Queue.hpp"
 
 namespace thr
