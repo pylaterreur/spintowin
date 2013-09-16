@@ -37,6 +37,7 @@ namespace
 #include "Assembly.hpp"
 #include "Layers/Consumer.hpp"
 #include "Layers/Producer.hpp"
+#include "Layers/Control.hpp"
 #include "Queue.hpp"
 
 namespace thr
@@ -49,12 +50,10 @@ namespace
   struct Consumer
   {
     template <typename Q>
-    void operator()(Q& q) const
+    void operator()(Q* const q) const
     {
-      {
-	// std::vector<std::string> q;
-	std::copy(std::move(q.consume_begin()), q.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
-      }
+      // std::vector<std::string> q;
+      std::copy(std::move(q->consume_begin()), q->end(), std::ostream_iterator<std::string>(std::cout, "\n"));
     }
 
   };
@@ -72,10 +71,10 @@ namespace
     {}
 
     template <typename Q>
-    void operator()(Q& q) const
+    void operator()(Q* const q) const
     {
       std::ifstream ifile(filename_);
-      auto begin = std::back_inserter(q);
+      auto begin = std::back_inserter(*q);
 
       std::for_each(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), [&begin](const std::string &input)
 		    {
@@ -93,6 +92,7 @@ namespace
 int main()
 {
   typedef typename Assembly<Queue<std::string>,
+		   Layers::Control,
 		   Layers::Producer,
 		   Layers::Consumer>::Whole::Business Queue;
   Queue queue = Queue();
@@ -101,9 +101,9 @@ int main()
   std::vector<thr::thread> consumers;
   std::vector<thr::thread> producers;
 
-  // consumers.push_back(thr::thread(Consumer(), queue));
-  producers.push_back(thr::thread(Producer(), queue));
-  consumers.push_back(thr::thread(Consumer(), queue));
+  // consumers.push_back(thr::thread(Consumer(), &queue));
+  producers.push_back(thr::thread(Producer(), &queue));
+  consumers.push_back(thr::thread(Consumer(), &queue));
 
   // consumers[0].join();
   for (auto &&t : producers)

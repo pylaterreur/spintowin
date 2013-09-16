@@ -47,17 +47,22 @@ private:
     ~iterator()
     {
       --*ref_counter_;
-      if (*ref_counter_)
+      if (*ref_counter_ == 0)
 	{
+	  // q.reader_end_[r_] = 1;
+	  // if (r_ == q.r_)
+	  //   {
+	  //     q.reader_end_[q.r_] = 0;
+	  //     ++q.r_;
+	  //   }
+
 	  /* 
 	  ** signal q_ that the minimum consumer index cant be r_ anymore,
-	  ** IF ref_counter_ < 2
 	  ** (atomic plz)
 	  ** in that case, q_ will have to notify if r_ and minimum consumer index were the same
 	  */
+	  delete ref_counter_;
 	}
-      else
-	delete ref_counter_;
     }
 
     // we aint caring about exception safety and Herb Sutter stuff
@@ -105,6 +110,8 @@ public:
     {
       return (iterator());
     }
+
+    friend iterator;
   };
 
 };
