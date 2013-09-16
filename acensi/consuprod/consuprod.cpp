@@ -66,9 +66,8 @@ namespace
     void operator()(Q* const q) const
     {
       std::ifstream ifile(filename_);
-      auto begin = std::back_inserter(*q);
 
-      std::copy(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), begin);
+      std::copy(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), std::back_inserter(*q));
       if (!ifile.eof())
 	std::cerr << "problem with file " << filename_ << std::endl;
     }
