@@ -10,28 +10,20 @@
 
 namespace
 {
-  struct iterator_base// : Base
-{
-  template <typename T>
-  bool operator==(T&& t) const
+  struct iterator_base
   {
-    return (false);
-  }
+    template <typename T>
+    bool operator==(T&& t) const
+    {
+      return (false);
+    }
 
-  template <typename T>
-  bool operator!=(T&& t) const
-  {
-    return (!(*this == std::forward<T>(t)));
-  }
-
-
-
-  // template <typename T>
-  // T& operator=(T&& t);
-
-  // std:: operator=(T&& t)
-  // {}
-};
+    template <typename T>
+    bool operator!=(T&& t) const
+    {
+      return (!(*this == std::forward<T>(t)));
+    }
+  };
 }
 
 #include "Assembly.hpp"

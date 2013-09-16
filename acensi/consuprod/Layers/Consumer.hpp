@@ -7,29 +7,28 @@ template <typename Super>
 struct Consumer : Super
 {
 private:
-  template <typename T>
-  struct dereference_iterator
+  struct iterator : std::iterator<std::input_iterator_tag, typename Super::Business::value_type>, iterator_base
   {
-    T operator*()
-    {
-      //      return (std::string("hihi"));
-    }
-  };
+    typedef typename Super::Business::value_type value_type;
+    typedef typename Super::Whole::Business QueueType;
 
-  template <template <typename...> class Container, typename T, typename ...Others>
-  struct dereference_iterator<Container<T, Others...> >
-  {
-    T operator*()
+  private:
+    template <typename T>
+    struct Container
+    {};
+
+    template <template <typename...> class C, typename T, typename ...Others>
+    struct Container <C<T, Others...> >
+    {
+      typedef T value_type;
+    };
+
+  public:
+    typename Container<typename Super::Business::value_type>::value_type operator*() const
     {
       //      static_cast<>
       return (std::string("hihi"));
     }
-  };
-
-  struct iterator : std::iterator<std::input_iterator_tag, typename Super::Business::value_type>, iterator_base, dereference_iterator<typename Super::Business::value_type>
-  {
-    typedef typename Super::Business::value_type value_type;
-    typedef typename Super::Whole::Business QueueType;
 
     iterator() : q_(0), ref_counter_(new unsigned (1)), r_(0)
     {}
@@ -41,26 +40,25 @@ private:
 
     iterator(QueueType &q) : q_(&q), ref_counter_(new unsigned (1))
     {
-      // r_ = q.r_++ (atomic)
+      // ATOMIC PLEASE
+      r_ = q_->r_++;
     }
 
     ~iterator()
     {
       --*ref_counter_;
+      // ATOMIC PLEASE
       if (*ref_counter_ == 0)
 	{
-	  // q.reader_end_[r_] = 1;
-	  // if (r_ == q.r_)
-	  //   {
-	  //     q.reader_end_[q.r_] = 0;
-	  //     ++q.r_;
-	  //   }
-
-	  /* 
-	  ** signal q_ that the minimum consumer index cant be r_ anymore,
-	  ** (atomic plz)
-	  ** in that case, q_ will have to notify if r_ and minimum consumer index were the same
-	  */
+	  q_->reader_end_[r_] = 1;
+	  if (r_ == q_->min_r_)
+	    {
+	      while (q_->reader_end_[q_->r_])
+		{
+		  q_->reader_end_[q_->r_] = 0;
+		  ++q_->min_r_;
+		}
+	    }
 	  delete ref_counter_;
 	}
     }
