@@ -4,7 +4,8 @@
 template <typename T>
 struct Queue
 {
-  typedef std::shared_ptr<T> value_type;
+  // typedef std::shared_ptr<T> value_type;
+  typedef T value_type;
 
   Queue() : i_(0), r_(0)
   {}

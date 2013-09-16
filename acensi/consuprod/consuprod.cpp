@@ -45,7 +45,7 @@ namespace
     void operator()(Q* const q) const
     {
       // std::vector<std::string> q;
-      std::copy(std::move(q->consume_begin()), q->end(), std::ostream_iterator<std::string>(std::cout, "\n"));
+      std::copy(q->consume_begin(), q->end(), std::ostream_iterator<std::string>(std::cout, "\n"));
     }
 
   };
@@ -68,12 +68,7 @@ namespace
       std::ifstream ifile(filename_);
       auto begin = std::back_inserter(*q);
 
-      std::for_each(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), [&begin](const std::string &input)
-		    {
-		      typename Q::value_type p(new std::string(input));
-		      *begin = p;
-		    }
-		    );
+      std::copy(std::istream_iterator<std::string>(ifile), std::istream_iterator<std::string>(), begin);
       if (!ifile.eof())
 	std::cerr << "problem with file " << filename_ << std::endl;
     }

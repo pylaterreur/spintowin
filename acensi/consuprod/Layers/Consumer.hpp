@@ -15,19 +15,20 @@ private:
   private:
     template <typename T>
     struct Container
-    {};
-
-    template <template <typename...> class C, typename T, typename ...Others>
-    struct Container <C<T, Others...> >
     {
       typedef T value_type;
     };
 
+    // template <template <typename...> class C, typename T, typename ...Others>
+    // struct Container <C<T, Others...> >
+    // {
+    //   typedef T value_type;
+    // };
+
   public:
     typename Container<typename Super::Business::value_type>::value_type operator*() const
     {
-      //      static_cast<>
-      return (std::string("hihi"));
+      return (q_->buffer_[r_]);
     }
 
     iterator() : q_(0), ref_counter_(new unsigned (1)), r_(0)
@@ -57,6 +58,8 @@ private:
 		{
 		  q_->reader_end_[q_->r_] = 0;
 		  ++q_->min_r_;
+		  if (q_->min_r_ >= sizeof(q_->reader_end_) / sizeof(*q_->reader_end_))
+		    q_->min_r_ = 0;
 		}
 	    }
 	  delete ref_counter_;
