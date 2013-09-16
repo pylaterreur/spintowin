@@ -31,29 +31,33 @@ private:
     typedef typename Super::Business::value_type value_type;
     typedef typename Super::Whole::Business QueueType;
 
-    iterator() : q_(0)// , r_(0)
+    iterator() : q_(0), ref_counter_(new unsigned (1)), r_(0)
     {}
 
-    iterator(iterator &&copy) = default;
-
-    iterator(const iterator &copy)
+    iterator(const iterator &copy) : q_(copy.q_), ref_counter_(copy.ref_counter_), r_(copy.r_)
     {
-      std::cerr << "GOT A COPY HERE MAN" << std::endl;
+      ++*ref_counter_;
     }
 
-    iterator(QueueType &q)
+    iterator(QueueType &q) : q_(&q), ref_counter_(new unsigned (1))
     {
       // r_ = q.r_++ (atomic)
     }
 
     ~iterator()
     {
-      /* 
-      ** signal q_ that the minimum consumer index cant be r_ anymore,
-      ** IF ref_counter_ < 2
-      ** (atomic plz)
-      ** in that case, q_ will have to notify if r_ and minimum consumer index were the same
-      */
+      --*ref_counter_;
+      if (*ref_counter_)
+	{
+	  /* 
+	  ** signal q_ that the minimum consumer index cant be r_ anymore,
+	  ** IF ref_counter_ < 2
+	  ** (atomic plz)
+	  ** in that case, q_ will have to notify if r_ and minimum consumer index were the same
+	  */
+	}
+      else
+	delete ref_counter_;
     }
 
     // we aint caring about exception safety and Herb Sutter stuff
@@ -62,33 +66,27 @@ private:
     {
       if (this != &copy)
 	{
+	  QueueType& q = *q_;
 	  this->~iterator();
-	  new(this) (iterator());
+	  new(this) iterator(q);
 	}
       return (*this);
     }
 
     iterator operator++(int) = delete;
-    // {
-    //   iterator prev = *this;
-    //   ++*this;
-    //   return (prev);
-    // }
-
-    // iterator
 
     iterator operator++()
     {
-      
+      QueueType& q = *q_;
+      this->~iterator();
+      new (this) iterator(q);
       return (*this);
     }
 
     QueueType *q_;
     unsigned r_;
-    
-    // {
-    //   return ();
-    // }
+    // make it atomic?
+    unsigned *ref_counter_;
   };
 
 public:
@@ -96,22 +94,17 @@ public:
   {
     template <typename... T>
     Business(T&&... t) : Super::Business(t...)
-    {
-
-    }
-
-    typename Super::Business::value_type pop()
-    {
-      
-    }
+    {}
 
     iterator consume_begin()
     {
-      
+      return (iterator(*static_cast<typename Super::Whole::Business*>(this)));
     }
 
     iterator end()
-    {}
+    {
+      return (iterator());
+    }
   };
 
 };
