@@ -19,6 +19,13 @@ public:
       // wait if insert index == lowest consumer index
       // increment
       // Super::Business::insert(std::forward<T>(t));
+
+      // make it atomic plz
+      if (Super::Business::i_ == Super::Business::min_r_)
+	{
+	  // wait (consumer should notify)
+	}
+      
     }
 
   };

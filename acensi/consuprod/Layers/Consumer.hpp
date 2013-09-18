@@ -42,7 +42,11 @@ private:
     iterator(QueueType &q) : q_(&q), ref_counter_(new unsigned (1))
     {
       // ATOMIC PLEASE
-      r_ = q_->r_++;
+      // (should be ok, Control.hpp overloads q_->r_ operator++ with atomicity)
+
+      // if we want more control, use fetch_add instead of operator++(int)
+      // WAIT FOR THE Q to be ready!
+      r_ = q_->increment_reader();
     }
 
     ~iterator()
@@ -92,6 +96,10 @@ private:
     QueueType *q_;
     unsigned r_;
     // make it atomic?
+    // guess not, container is thread safe,
+    // not iterators, and that's ok atm
+
+    // boost::atomic<unsigned> *
     unsigned *ref_counter_;
   };
 
