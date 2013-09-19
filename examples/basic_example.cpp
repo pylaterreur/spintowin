@@ -14,7 +14,13 @@ int main()
   typedef Assembly::Whole::Business AspectizedPerson;
   AspectizedPerson p("Toto");
 
-  //  std::cout << static_cast<typename GetAspect<Assembly::Whole, IB52>::Type>(p) << std::endl;
+  auto *a = static_cast<typename GetAspect<Assembly::Whole, IB52>::Type::Business*>(&p);
+  a->function();
+  static_cast<typename GetAspect<Assembly::Whole, IA1>::Type::Business*>(a)->function();
+
+  std::cout << "---------------" << std::endl;
+
+  //  static_cast<typename GetUpperAspect<>::Type::Business*>
   std::cout << p << std::endl;
 
   //  p.functionB();

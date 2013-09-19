@@ -16,38 +16,29 @@ struct AspectIsLast
   static const bool result = sizeof(test<Aspect>(0)) == sizeof(yes);
 };
 
-template <typename Chain, typename Aspect, bool IsFinal = AspectIsLast<Aspect>::result >
-struct GetAspect
+template <typename Chain, template <typename, typename...> class Aspect>
+struct GetAspect;
+
+template <template <typename, typename...> class FirstAspect, template <typename, typename...> class Aspect, typename First, typename ...Args>
+struct GetAspect<FirstAspect<First, Args...>, Aspect>
 {
-  typedef typename GetAspect<typename Chain::Super, Aspect>::Type Type;
+  typedef typename GetAspect<First, Aspect>::Type Type;
 };
 
-template <typename Chain, typename Aspect>
-struct GetAspect<Chain, Aspect, false>
+template <template <typename, typename...> class Aspect, typename First, typename... Args>
+struct GetAspect<Aspect<First, Args...>, Aspect>
 {
-  typedef typename GetAspect<typename Chain::Super, Aspect>::Type Type;
+  typedef Aspect<First> Type;
 };
 
-template <typename SameAspect, bool IsFinal>
-struct GetAspect<SameAspect, SameAspect, IsFinal>
-{
-  typedef SameAspect Type;
-};
+// template <typename>
+// struct GetUpperAspect;
 
-template <typename Aspect, bool IsFinal>
-struct GetAspect<Aspect, typename Aspect::Super, IsFinal>
-{
-  typedef Aspect Type;
-};
-
-template <typename>
-struct GetUpperAspect;
-
-template <template <typename> class Aspect, typename Super>
-struct GetUpperAspect<Aspect<Super> >
-{
-  typedef GetAspect<typename Super::Whole, Aspect<Super> > Type;
-};
+// template <template <typename, typename...> class Aspect, typename Super, typename ...Args>
+// struct GetUpperAspect<Aspect<Super, Args...> >
+// {
+//   typedef typename GetAspect<typename Super::Whole, Aspect<Super, Args...> >::Type Type;
+// };
 
 
 #endif	// !UTILITY_HPP_

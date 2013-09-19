@@ -16,6 +16,11 @@ struct IA1 : Super
     {
       std::cout << "this object has the method functionA() because it is aspectized by IA1"<< std::endl;
     }
+
+    void function() const
+    {
+      std::cout << "IA1::function()" << std::endl;
+    }
   };
 };
 
@@ -28,6 +33,10 @@ struct IA2 : Super
     Business(Args&&... args) : Super::Business(args...)
     {}
 
+    void function() const
+    {
+      std::cout << "IA2::function()" << std::endl;
+    }
   };
 };
 
@@ -49,6 +58,11 @@ struct IB52 : Super
     void functionB1() const
     {
       //      static_cast<typename GetUpperAspect<IB52> >
+    }
+
+    void function() const
+    {
+      std::cout << "IB52::function()" << std::endl;
     }
   };
 
