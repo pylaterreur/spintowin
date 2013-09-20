@@ -1,5 +1,7 @@
 #include <typeinfo>
 #include <iostream>
+#include <type_traits>
+
 #include "Assembly.hpp"
 
 #include "../examples/Utility.hpp"
@@ -43,6 +45,19 @@ struct A2 : Super
   };
 };
 
+template <typename Super>
+struct A3 : Super
+{
+  struct Business : Super::Business
+  {
+    template <typename... T>
+    Business(T&&... t) : Super::Business(t...)
+    {
+      std::cout << "A3" << std::endl;
+    }
+  };
+};
+
 struct Foo
 {
   Foo(const std::string &str)
@@ -53,7 +68,8 @@ struct Foo
 
 int main()
 {
-  Assembly<Foo, A1, B52>::Whole::Business f("abc");
+  typedef Assembly<Foo, A1, A3, B52>::Whole Toto;
+  Toto::Business f("abc");
   std::cout << typeid(decltype(f)).name() << std::endl;
 
   // compiles ;)
@@ -63,6 +79,23 @@ int main()
   // does not compile! ;)
   // GetAspect<decltype(p)::BusinessToWhole, A2>::Type::Business p2("hihi");
   //  std::cout << typeid(decltype(p2)).name() << std::endl;
+
+  static_assert(std::is_same<Toto, GetPrevChain<Toto>::Type>::value, "lol");
+
+  static_assert(std::is_same<Toto, GetPrevChain<GetNextChain<Toto>::Type>::Type>::value, "lol");
+
+  //  static_assert(std::is_same<Toto, GetNextChain<GetPrevChain<Toto>::Type>::Type>::value, "lol");
+  
+  std::cout << "--------------------------" << std::endl;
+
+  static_assert(std::is_same<
+  		  GetNextChain<GetNextChain<Toto>::Type>::Type,
+		  GetNextChain<
+  		  GetPrevChain<
+  		  GetNextChain<GetNextChain<Toto>::Type>::Type
+  		    >::Type
+		    >::Type
+  		  >::value, "lol");
 
   //  std::cout << std::boolalpha << AspectIsLast<Assembly<Foo>::Whole::Business>::result << std::endl;
 }
