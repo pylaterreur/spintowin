@@ -1,6 +1,8 @@
 #ifndef UTILITY_HPP_
 # define UTILITY_HPP_
 
+namespace Aop
+{
 template <typename Aspect>
 struct AspectIsLast
 {
@@ -16,32 +18,34 @@ struct AspectIsLast
   static const bool result = sizeof(test<Aspect>(0)) == sizeof(yes);
 };
 
+namespace Implem
+{
 template <typename Chain, template <typename, typename...> class Aspect>
-struct GetAspect;
+struct Get;
 
 template <template <typename, typename...> class FirstAspect, template <typename, typename...> class Aspect, typename First, typename ...Args>
-struct GetAspect<FirstAspect<First, Args...>, Aspect>
+struct Get<FirstAspect<First, Args...>, Aspect>
 {
-  typedef typename GetAspect<First, Aspect>::Type Type;
+  typedef typename Get<First, Aspect>::Type Type;
 };
 
 template <template <typename, typename...> class Aspect, typename First, typename... Args>
-struct GetAspect<Aspect<First, Args...>, Aspect>
+struct Get<Aspect<First, Args...>, Aspect>
 {
   typedef Aspect<First> Type;
 };
 
 template <typename Chain>
-struct GetNextChain;
+struct NextChain;
 
 template <template <typename, typename...> class Aspect, typename First, typename... Args>
-struct GetNextChain<Aspect<First, Args...> >
+struct NextChain<Aspect<First, Args...> >
 {
   typedef First Type;
 };
 
 template <typename Chain>
-struct GetPrevChain
+struct PrevChain
 {
 private:
   template <typename T, bool notChain = !std::is_same<Chain, T>::value, bool Dummy = false>
@@ -69,6 +73,7 @@ public:
   typedef typename Helper<typename Chain::Whole>::Type Type;
 };
 
+}
 
 // template <typename Chain>
 // struct GetPrevChain<Chain>::Helper<Chain>
@@ -86,5 +91,6 @@ public:
 //   typedef typename GetAspect<typename Super::Whole, Aspect<Super, Args...> >::Type Type;
 // };
 
+}
 
 #endif	// !UTILITY_HPP_

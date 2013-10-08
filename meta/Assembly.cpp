@@ -82,31 +82,33 @@ struct Foo
 
 int main()
 {
+  using namespace Aop::Implem;
+
   typedef Assembly<Foo, A1, A3, B52>::Whole Toto;
   Toto::Business f("abc");
   std::cout << typeid(decltype(f)).name() << std::endl;
 
   // compiles ;)
-  GetAspect<decltype(f)::BusinessToWhole, A1>::Type::Business p("hihi");
+  Get<decltype(f)::BusinessToWhole, A1>::Type::Business p("hihi");
   std::cout << typeid(decltype(p)).name() << std::endl;
 
   // does not compile! ;)
-  // GetAspect<decltype(p)::BusinessToWhole, A2>::Type::Business p2("hihi");
+  // Get<decltype(p)::BusinessToWhole, A2>::Type::Business p2("hihi");
   //  std::cout << typeid(decltype(p2)).name() << std::endl;
 
-  static_assert(std::is_same<Toto, GetPrevChain<Toto>::Type>::value, "lol");
+  static_assert(std::is_same<Toto, PrevChain<Toto>::Type>::value, "lol");
 
-  static_assert(std::is_same<Toto, GetPrevChain<GetNextChain<Toto>::Type>::Type>::value, "lol");
+  static_assert(std::is_same<Toto, PrevChain<NextChain<Toto>::Type>::Type>::value, "lol");
 
-  //  static_assert(std::is_same<Toto, GetNextChain<GetPrevChain<Toto>::Type>::Type>::value, "lol");
+  //  static_assert(std::is_same<Toto, NextChain<PrevChain<Toto>::Type>::Type>::value, "lol");
   
   std::cout << "--------------------------" << std::endl;
 
   static_assert(std::is_same<
-  		  GetNextChain<GetNextChain<Toto>::Type>::Type,
-		  GetNextChain<
-  		  GetPrevChain<
-  		  GetNextChain<GetNextChain<Toto>::Type>::Type
+  		  NextChain<NextChain<Toto>::Type>::Type,
+		  NextChain<
+  		  PrevChain<
+  		  NextChain<NextChain<Toto>::Type>::Type
   		    >::Type
 		    >::Type
   		  >::value, "lol");
