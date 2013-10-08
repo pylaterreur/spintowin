@@ -4,11 +4,22 @@
 
 #include "Assembly.hpp"
 
-#include "../examples/Utility.hpp"
+#include "Utility.hpp"
+
+struct Aspect
+{};
+
+struct AspectA : Aspect
+{};
+
+struct AspectB : Aspect
+{};
 
 template <typename Super>
 struct B52 : Super
 {
+  typedef AspectB Implem;
+
   struct Business : Super::Business
   {
     template <typename... T>
@@ -22,6 +33,7 @@ struct B52 : Super
 template <typename Super>
 struct A1 : Super
 {
+  typedef AspectA Implem;
   struct Business : Super::Business
   {
     template <typename... T>
@@ -35,6 +47,7 @@ struct A1 : Super
 template <typename Super>
 struct A2 : Super
 {
+  typedef AspectA Implem;
   struct Business : Super::Business
   {
     template <typename... T>
@@ -48,6 +61,7 @@ struct A2 : Super
 template <typename Super>
 struct A3 : Super
 {
+  typedef AspectA Implem;
   struct Business : Super::Business
   {
     template <typename... T>
