@@ -1,6 +1,8 @@
 #ifndef ASSEMBLY_HPP_
 # define ASSEMBLY_HPP_
 
+namespace Aop
+{
 template <typename Implem, template <typename, typename...> class... Layers>
 struct Assembly
 {
@@ -34,5 +36,6 @@ public:
     typedef Whole BusinessToWhole;
   };
 };
+}
 
 #endif

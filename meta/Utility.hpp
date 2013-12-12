@@ -5,21 +5,6 @@
 
 namespace Aop
 {
-template <typename Aspect>
-struct AspectIsLast
-{
-  typedef char yes[1];
-  typedef char no[2];
-
-  template <typename C>
-  static yes& test(typename C::Super *);
-
-  template <typename>
-  static no& test(...);
-
-  static const bool result = sizeof(test<Aspect>(0)) == sizeof(yes);
-};
-
 namespace Implem
 {
 template <typename Chain, template <typename, typename...> class Aspect>
@@ -81,23 +66,32 @@ public:
   typedef typename Helper<typename Chain::Whole>::Type Type;
 };
 
+template <typename Aspect>
+struct AspectIsLast
+{
+  static const bool result = std::is_same<typename Implem::NextChain<Aspect>::Type, Aspect>::value;
+};
+
+template <typename Chain1, typename Chain2>
+struct IsSameChain
+{
+  static const bool value = false;
+};
+
+template <template <typename, typename...> class FirstAspect, typename First1, typename First2, typename ...Args1, typename ...Args2>
+struct IsSameChain<FirstAspect<First1, Args1...>, FirstAspect<First2, Args2...> >
+{
+private:
+  static const bool first_is_last = AspectIsLast<FirstAspect<First1, Args1...> >::result;
+  static const bool second_is_last = AspectIsLast<FirstAspect<First2, Args2...> >::result;
+
+public:
+  static const bool value = (first_is_last && second_is_last) ?
+    true :
+    (first_is_last == second_is_last ? IsSameChain<First1, First2>::value : false);
+};
+
 }
-
-// template <typename Chain>
-// struct GetPrevChain<Chain>::Helper<Chain>
-// {
-//   typedef Chain Type;
-// };
-
-
-// template <typename>
-// struct GetUpperAspect;
-
-// template <template <typename, typename...> class Aspect, typename Super, typename ...Args>
-// struct GetUpperAspect<Aspect<Super, Args...> >
-// {
-//   typedef typename GetAspect<typename Super::Whole, Aspect<Super, Args...> >::Type Type;
-// };
 
 }
 

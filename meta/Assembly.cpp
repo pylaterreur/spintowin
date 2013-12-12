@@ -82,6 +82,7 @@ struct Foo
 
 int main()
 {
+  using namespace Aop;
   using namespace Aop::Implem;
 
   typedef Assembly<Foo, A1, A3, B52>::Whole Toto;
@@ -114,4 +115,17 @@ int main()
   		  >::value, "lol");
 
   //  std::cout << std::boolalpha << AspectIsLast<Assembly<Foo>::Whole::Business>::result << std::endl;
+
+  {
+    typedef Assembly<Foo, A1>::Whole Toto1;
+    typedef Assembly<Foo, A1, A2>::Whole Toto2;
+    typedef Assembly<Foo, A1, A1>::Whole Toto3;
+
+    static_assert(IsSameChain<Toto1, Toto2>::value == false, "Assembly<Foo, A1>::Whole and Assembly<Foo, A1, A2>::Whole aren't supposed to be same chain");
+    static_assert(IsSameChain<Toto2, Toto3>::value == false, "Assembly<Foo, A1, A2>::Whole and Assembly<Foo, A1, A1>::Whole aren't supposed to be same chain");
+    static_assert(IsSameChain<PrevChain<Toto2>::Type, Toto2>::value == true, "PrevChain<Assembly<Foo, A1, A2>::Whole>::Type and Assembly<Foo, A1, A2>::Whole are supposed to be same chain");
+    static_assert(IsSameChain<NextChain<Toto1>::Type, Toto1>::value == true, "NextChain<Assembly<Foo, A1>::Whole>::Type and Assembly<Foo, A1>::Whole are supposed to be same chain");
+    static_assert(IsSameChain<NextChain<Toto2>::Type, Toto1>::value == true, "NextChain<Assembly<Foo, A1, A2>::Whole>::Type and Assembly<Foo, A1>::Whole are supposed to be same chain");
+  }
+
 }
