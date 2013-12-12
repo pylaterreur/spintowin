@@ -1,6 +1,8 @@
 #ifndef UTILITY_HPP_
 # define UTILITY_HPP_
 
+# include "Assembly.hpp"
+
 namespace Aop
 {
 template <typename Aspect>
@@ -37,6 +39,12 @@ struct Get<Aspect<First, Args...>, Aspect>
 
 template <typename Chain>
 struct NextChain;
+
+template <template <typename, typename...> class LastLayer, typename ...Args, typename Implem, template <typename, typename...> class... Layers>
+struct NextChain<LastLayer<Assembly<Implem, Layers...>, Args... > >
+{
+  typedef LastLayer<Assembly<Implem, Layers...>, Args... > Type;
+};
 
 template <template <typename, typename...> class Aspect, typename First, typename... Args>
 struct NextChain<Aspect<First, Args...> >
