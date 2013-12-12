@@ -82,41 +82,13 @@ struct Foo
 
 int main()
 {
+  // for Assembly
   using namespace Aop;
+  // for more "advanced" Aop utilities
   using namespace Aop::Implem;
 
-  typedef Assembly<Foo, A1, A3, B52>::Whole Toto;
-  Toto::Business f("abc");
-  std::cout << typeid(decltype(f)).name() << std::endl;
-
-  // compiles ;)
-  Get<decltype(f)::BusinessToWhole, A1>::Type::Business p("hihi");
-  std::cout << typeid(decltype(p)).name() << std::endl;
-
-  // does not compile! ;)
-  // Get<decltype(p)::BusinessToWhole, A2>::Type::Business p2("hihi");
-  //  std::cout << typeid(decltype(p2)).name() << std::endl;
-
-  static_assert(std::is_same<Toto, PrevChain<Toto>::Type>::value, "lol");
-
-  static_assert(std::is_same<Toto, PrevChain<NextChain<Toto>::Type>::Type>::value, "lol");
-
-  //  static_assert(std::is_same<Toto, NextChain<PrevChain<Toto>::Type>::Type>::value, "lol");
-  
-  std::cout << "--------------------------" << std::endl;
-
-  static_assert(std::is_same<
-  		  NextChain<NextChain<Toto>::Type>::Type,
-		  NextChain<
-  		  PrevChain<
-  		  NextChain<NextChain<Toto>::Type>::Type
-  		    >::Type
-		    >::Type
-  		  >::value, "lol");
-
-  //  std::cout << std::boolalpha << AspectIsLast<Assembly<Foo>::Whole::Business>::result << std::endl;
-
   {
+    // Let's unit-test the library at compile-time!
     typedef Assembly<Foo, A1>::Whole Toto1;
     typedef Assembly<Foo, A1, A2>::Whole Toto2;
     typedef Assembly<Foo, A1, A1>::Whole Toto3;
@@ -125,7 +97,23 @@ int main()
     static_assert(IsSameChain<Toto2, Toto3>::value == false, "Assembly<Foo, A1, A2>::Whole and Assembly<Foo, A1, A1>::Whole aren't supposed to be same chain");
     static_assert(IsSameChain<PrevChain<Toto2>::Type, Toto2>::value == true, "PrevChain<Assembly<Foo, A1, A2>::Whole>::Type and Assembly<Foo, A1, A2>::Whole are supposed to be same chain");
     static_assert(IsSameChain<NextChain<Toto1>::Type, Toto1>::value == true, "NextChain<Assembly<Foo, A1>::Whole>::Type and Assembly<Foo, A1>::Whole are supposed to be same chain");
+    static_assert(IsSameChain<PrevChain<NextChain<Toto2>::Type>::Type, Toto2>::value == true, "PrevChain<NextChain<Assembly<Foo, A1, A2>::Whole>::Type>::Type and Assembly<Foo, A1, A2>::Whole are supposed to be same chain");
     static_assert(IsSameChain<NextChain<Toto2>::Type, Toto1>::value == true, "NextChain<Assembly<Foo, A1, A2>::Whole>::Type and Assembly<Foo, A1>::Whole are supposed to be same chain");
+    {
+      typedef Get<Toto2::Business::BusinessToWhole, A1>::Type GetTest;
+      static_assert(IsSameChain<GetTest, Toto1>::value == true, "Get<Assembly<Foo, A1, A2>::Whole::Business::BusinessToWhole, A1>::Type and Assembly<Foo, A1>::Whole are supposed to be same chain");
+    }
   }
 
+  {
+    // Runtime test
+    typedef Assembly<Foo, A1, A3, B52>::Whole Toto;
+    // here we have an f variable of type Foo, aspectized by A1, the A1<Foo> aspectized by A3, aspectized by B52
+    Toto::Business f("abc");
+    std::cout << typeid(decltype(f)).name() << std::endl;
+
+    // here, p is using the layers of Toto starting from the A3 layer, aka A3<A1<Foo> >
+    Get<decltype(f)::BusinessToWhole, A3>::Type::Business p("hihi");
+    std::cout << typeid(decltype(p)).name() << std::endl;
+  }
 }
