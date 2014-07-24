@@ -29,9 +29,7 @@ public:
   typedef typename AssemblyHelper<Assembly, Layers...>::Whole Whole;
   struct Business : Implem
   {
-    template <typename... T>
-    Business(T&& ...t) : Implem(t...)
-    {}
+    using Implem::Implem;
 
     typedef Whole BusinessToWhole;
   };
